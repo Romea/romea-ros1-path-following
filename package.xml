@@ -25,7 +25,8 @@
   <depend>romea_core_control</depend>
   <depend>romea_core_path</depend>
   <depend>romea_core_path_following</depend>
-  <depend>romea_core_odo</depend>
-  <!-- <depend>romea_following_utils</depend> -->
 
+  <export>
+    <nodelet plugin="${prefix}/nodelet.xml"/>
+  </export>
 </package>

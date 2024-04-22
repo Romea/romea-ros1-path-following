@@ -58,6 +58,14 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   ${catkin_LIBRARIES}
 )
 
+add_executable(path_following_node
+  src/path_following_node.cpp
+)
+
+target_link_libraries(path_following_node PRIVATE
+  ${PROJECT_NAME}
+)
+
 # if(BUILD_TESTING)
 #     add_subdirectory(test)
 # endif()

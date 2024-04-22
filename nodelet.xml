@@ -1,0 +1,10 @@
+<library path="libromea_path_following">
+  <class name="romea_path_following/PathFollowingNodelet"
+         type="romea::ros1::PathFollowingNodelet"
+         base_class_type="nodelet::Nodelet">
+  <description>
+    PathMatching nodelet
+  </description>
+  </class>
+</library>
+

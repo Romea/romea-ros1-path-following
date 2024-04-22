@@ -12,26 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#include <nodelet/loader.h>
+#include <ros/ros.h>
 
-// std
-#include <memory>
-
-// local
-#include "romea_path_following/path_following_component.hpp"
-
-
-int main(int argc, char * argv[])
+int main(int argc, char ** argv)
 {
-  auto args = rclcpp::init_and_remove_ros_arguments(argc, argv);
+  ros::init(argc, argv, "path_following");
 
-  rclcpp::NodeOptions options;
-  options.arguments(args);
-  auto node = std::make_shared<romea::ros2::PathFollowingComponent>(options);
-
-  rclcpp::executors::MultiThreadedExecutor executor;
-  executor.add_node(node->get_node_base_interface());
-  executor.spin();
-
-  rclcpp::shutdown();
-  return 0;
+  nodelet::Loader nodelet;
+  nodelet::M_string remap(ros::names::getRemappings());
+  nodelet::V_string nargv;
+  std::string nodelet_name = ros::this_node::getName();
+  nodelet.load(nodelet_name, "romea_path_matching/PathFollowingNodelet", remap, nargv);
+  ros::spin();
 }
