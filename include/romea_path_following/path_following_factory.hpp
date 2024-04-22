@@ -132,9 +132,8 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
   using SlObsExtendedLyapunov =
     PathFollowingTraits<core::TwoAxleSteeringCommand>::SlidingObserver::ExtendedLyapunov;
 
-  template<typename Node>
   static std::unique_ptr<Base> make(
-    std::shared_ptr<Node> nh,
+    const ros::NodeHandle & nh,
     const std::string & lateral_control_name,
     const std::string & sliding_observer_name)
   {
@@ -179,7 +178,6 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
   using LatCtrlBackStepping =
     PathFollowingTraits<core::SkidSteeringCommand>::LateralControl::BackStepping;
 
-  template<typename Node>
   static std::unique_ptr<Base> make(
     const ros::NodeHandle & nh,
     const std::string & lateral_control_name,

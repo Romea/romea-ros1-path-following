@@ -50,7 +50,7 @@ include_directories(
 
 add_library(${PROJECT_NAME} SHARED
   src/path_following_nodelet.cpp
-  # src/path_following.cpp
+  src/path_following.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
