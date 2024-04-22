@@ -1,0 +1,51 @@
+test_path_following_factory:
+  ros__parameters:
+    sampling_period: 0.1
+    base:
+      wheelbase: 1.
+      inertia:
+        mass: 2.
+        center: [3., 4., 5.]
+        z_moment: 6.
+    lateral_control:
+      classic:
+        gains:
+          front_kd: 7.
+          rear_kd: 8.
+      predictive:
+        gains:
+          front_kd: 9.
+          rear_kd: 10.
+        prediction.horizon: 11
+        prediction.a0: 12.
+        prediction.a1: 13.
+        prediction.b1: 14.
+        prediction.b2: 15.
+      back_stepping:
+        gains:
+          kp: 30.0
+          ki: 31.0
+          kd: 32.0
+          iclamp: 33.0
+          front_kp: 34.0
+          front_kd: 35.0
+          rear_kd: 36.0
+        maximal_omega_d: 37.0
+
+    sliding_observer:
+      extended_cinematic:
+        gains:
+          lateral_deviation: 7.0
+          course_deviation: 8.0
+        filter_weights:
+          lateral_deviation: 0.09
+          course_deviation: 0.10
+          front_sliding_angle: 0.11
+          rear_sliding_angle: 0.12
+      extended_lyapunov:
+        gains:
+          x_deviation: 13.0
+          y_deviation: 14.0
+          course_deviation: 15.0
+          front_sliding_angle: 16.0
+          rear_sliding_angle: 17.0

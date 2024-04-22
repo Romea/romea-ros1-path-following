@@ -1,0 +1,31 @@
+test_sliding_observer_parameters:
+  ros__parameters:
+    sampling_period: 0.1
+    base:
+      wheelbase: 1.
+      inertia:
+        mass: 2.
+        center: [3., 4., 5.]
+        z_moment: 6.
+      command_limits:
+        minimal_longitudinal_speed: -2.0
+        maximal_longitudinal_speed: 2.0
+        maximal_front_steering_angle: 0.7
+        maximal_rear_steering_angle: 0.7
+    sliding_observer:
+      cinematic:
+        gains:
+          lateral_deviation: 7.0
+          course_deviation: 8.0
+        filter_weights:
+          lateral_deviation: 0.09
+          course_deviation: 0.10
+          front_sliding_angle: 0.11
+          rear_sliding_angle: 0.12
+      lyapunov:
+        gains:
+          x_deviation: 13.0
+          y_deviation: 14.0
+          course_deviation: 15.0
+          front_sliding_angle: 16.0
+          rear_sliding_angle: 17.0
