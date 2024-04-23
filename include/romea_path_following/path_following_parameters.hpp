@@ -53,7 +53,7 @@ inline core::MobileBaseInertia get_inertia(const ros::NodeHandle & nh)
 }
 
 template<typename CommandLimits>
-CommandLimits get_command_limits(const ros::NodeHandle & nh)
+CommandLimits get_base_command_limits(const ros::NodeHandle & nh)
 {
   return get_command_limits<CommandLimits>(ros::NodeHandle(nh, "base/command_limits"));
 }

@@ -43,11 +43,14 @@ make_path_following(
   const std::string & longitudinal_control_name,
   const std::string & sliding_observer_name)
 {
+  ros::NodeHandle lat_nh(nh, "lateral_control/" + lateral_control_name);
+  ros::NodeHandle lon_nh(nh, "longitudinal_control/" + longitudinal_control_name);
+  ros::NodeHandle sliding_nh(nh, "sliding_observer/" + sliding_observer_name);
+
   return std::make_unique<core::PathFollowingWithSlidingObserver<LatCtrl, LonCtrl, SlObs>>(
-    make_lateral_control<LatCtrl>(ros::NodeHandle(nh, "lateral_control/" + lateral_control_name)),
-    make_longitudinal_control<LonCtrl>(
-      ros::NodeHandle(nh, "longitudinal_control/" + longitudinal_control_name)),
-    make_sliding_observer<SlObs>(ros::NodeHandle(nh, "sliding_observer/" + sliding_observer_name)));
+    make_lateral_control<LatCtrl>(lat_nh, nh),
+    make_longitudinal_control<LonCtrl>(lon_nh),
+    make_sliding_observer<SlObs>(sliding_nh, nh));
 }
 
 template<typename LatCtrl, typename LonCtrl>
@@ -57,10 +60,11 @@ make_path_following(
   const std::string & lateral_control_name,
   const std::string & longitudinal_control_name)
 {
+  ros::NodeHandle lat_nh(nh, "lateral_control/" + lateral_control_name);
+  ros::NodeHandle lon_nh(nh, "longitudinal_control/" + longitudinal_control_name);
+
   return std::make_unique<core::PathFollowingWithoutSlidingObserver<LatCtrl, LonCtrl>>(
-    make_lateral_control<LatCtrl>(ros::NodeHandle(nh, "lateral_control/" + lateral_control_name)),
-    make_longitudinal_control<LonCtrl>(
-      ros::NodeHandle(nh, "longitudinal_control/" + longitudinal_control_name)));
+    make_lateral_control<LatCtrl>(lat_nh, nh), make_longitudinal_control<LonCtrl>(lon_nh));
 }
 
 template<typename CommandType>
@@ -91,8 +95,7 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
     } else if (lateral_control_name == "predictive") {
       return make<LatCtrlPredictive>(nh, lateral_control_name, sliding_observer_name);
     } else {
-      // throw
-      return nullptr;
+      throw std::runtime_error("Unknown lateral_control algorithm '" + lateral_control_name + "'");
     }
   }
 
@@ -113,8 +116,8 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
       return make_path_following<LatCtrl, LonCtrl, SlObsExtendedLyapunov>(
         nh, lateral_control_name, "", sliding_observer_name);
     } else {
-      // throw
-      return nullptr;
+      throw std::runtime_error(
+        "Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
     }
   }
 };
@@ -142,8 +145,7 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
     } else if (lateral_control_name == "predictive") {
       return make<LatCtrlPredictive>(nh, lateral_control_name, sliding_observer_name);
     } else {
-      // throw
-      return nullptr;
+      throw std::runtime_error("Unknown lateral_control algorithm '" + lateral_control_name + "'");
     }
   }
 
@@ -164,8 +166,8 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
       return make_path_following<LatCtrl, LonCtrl, SlObsExtendedLyapunov>(
         nh, lateral_control_name, "", sliding_observer_name);
     } else {
-      // throw
-      return nullptr;
+      throw std::runtime_error(
+        "Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
     }
   }
 };
@@ -189,12 +191,12 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
         if (sliding_observer_name == "none") {
           return make_path_following<LatCtrlBackStepping, LonCtrl>(nh, lateral_control_name, "");
         } else {
-          // throw
-          return nullptr;
+          throw std::runtime_error(
+            "Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
         }
       } else {
-        // throw
-        return nullptr;
+        throw std::runtime_error(
+          "Unknown lateral_control algorithm '" + lateral_control_name + "'");
       }
     } else {
       return std::make_unique<core::OneAxleSteeringEquivalence>(

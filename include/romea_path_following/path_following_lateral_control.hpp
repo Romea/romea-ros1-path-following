@@ -56,8 +56,8 @@ struct PathFollowingLateralControlParameters<
   static Parameters get(const ros::NodeHandle & nh)
   {
     return {
-      {load_param<double>(nh, "gains.front_kd"),
-       load_param_or<double>(nh, "gains.rear_kd", std::numeric_limits<double>::quiet_NaN())}};
+      {load_param<double>(nh, "gains/front_kd"),
+       load_param_or<double>(nh, "gains/rear_kd", std::numeric_limits<double>::quiet_NaN())}};
   }
 };
 
@@ -71,12 +71,12 @@ struct PathFollowingLateralControlParameters<
   static Parameters get(const ros::NodeHandle & nh)
   {
     return {
-      {load_param<double>(nh, "gains.front_kd")},
-      load_param<int>(nh, "prediction.horizon"),
-      load_param<double>(nh, "prediction.a0"),
-      load_param<double>(nh, "prediction.a1"),
-      load_param<double>(nh, "prediction.b1"),
-      load_param<double>(nh, "prediction.b2")};
+      {load_param<double>(nh, "gains/front_kd")},
+      load_param<int>(nh, "prediction/horizon"),
+      load_param<double>(nh, "prediction/a0"),
+      load_param<double>(nh, "prediction/a1"),
+      load_param<double>(nh, "prediction/b1"),
+      load_param<double>(nh, "prediction/b2")};
   }
 };
 
@@ -90,13 +90,13 @@ struct PathFollowingLateralControlParameters<
   static Parameters get(const ros::NodeHandle & nh)
   {
     return {
-      {load_param<double>(nh, "gains.front_kd"),
-       load_param_or<double>(nh, "gains.rear_kd", std::numeric_limits<double>::quiet_NaN())},
-      load_param<int>(nh, "prediction.horizon"),
-      load_param<double>(nh, "prediction.a0"),
-      load_param<double>(nh, "prediction.a1"),
-      load_param<double>(nh, "prediction.b1"),
-      load_param<double>(nh, "prediction.b2")};
+      {load_param<double>(nh, "gains/front_kd"),
+       load_param_or<double>(nh, "gains/rear_kd", std::numeric_limits<double>::quiet_NaN())},
+      load_param<int>(nh, "prediction/horizon"),
+      load_param<double>(nh, "prediction/a0"),
+      load_param<double>(nh, "prediction/a1"),
+      load_param<double>(nh, "prediction/b1"),
+      load_param<double>(nh, "prediction/b2")};
   }
 };
 
@@ -111,10 +111,10 @@ struct PathFollowingLateralControlParameters<
   {
     return {
       {
-        load_param<double>(nh, "gains.kp"),
-        load_param_or<double>(nh, "gains.ki", 0.0),
-        load_param<double>(nh, "gains.kd"),
-        load_param_or<double>(nh, "gains.iclamp", 0.0),
+        load_param<double>(nh, "gains/kp"),
+        load_param_or<double>(nh, "gains/ki", 0.0),
+        load_param<double>(nh, "gains/kd"),
+        load_param_or<double>(nh, "gains/iclamp", 0.0),
       },
       load_param<double>(nh, "maximal_omega_d")};
   }
@@ -127,13 +127,14 @@ typename LateralControl::Parameters get_lateral_control_parameters(const ros::No
 }
 
 template<typename LateralControl>
-std::shared_ptr<LateralControl> make_lateral_control(const ros::NodeHandle & nh)
+std::shared_ptr<LateralControl> make_lateral_control(
+  const ros::NodeHandle & control_nh, const ros::NodeHandle & root_nh)
 {
   return std::make_shared<LateralControl>(
-    get_sampling_period(nh),
-    get_wheelbase(nh),
-    get_inertia(nh),
-    get_lateral_control_parameters<LateralControl>(nh));
+    get_sampling_period(root_nh),
+    get_wheelbase(root_nh),
+    get_inertia(root_nh),
+    get_lateral_control_parameters<LateralControl>(control_nh));
 }
 
 }  // namespace ros1

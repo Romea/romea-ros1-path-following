@@ -26,7 +26,8 @@ namespace ros1
 {
 //-----------------------------------------------------------------------------
 template<class CommandType>
-PathFollowing<CommandType>::PathFollowing(ros::NodeHandle & nh) : nh_(nh)
+PathFollowing<CommandType>::PathFollowing(ros::NodeHandle & nh, ros::NodeHandle & private_nh)
+: nh_(nh), private_nh_(private_nh)
 {
 }
 
@@ -34,29 +35,31 @@ PathFollowing<CommandType>::PathFollowing(ros::NodeHandle & nh) : nh_(nh)
 template<class CommandType>
 void PathFollowing<CommandType>::configure()
 {
-  setpoint_.store(get_setpoint(nh_));
+  setpoint_.store(get_setpoint(private_nh_));
   if constexpr (std::is_same_v<CommandType, core::SkidSteeringCommand>) {
     path_following_ = PathFollowingFactory<CommandType>::make(
-      nh_,
-      get_selected_lateral_control(nh_),
-      get_selected_sliding_observer(nh_),
-      get_one_steering_equivalence(nh_));
+      private_nh_,
+      get_selected_lateral_control(private_nh_),
+      get_selected_sliding_observer(private_nh_),
+      get_one_steering_equivalence(private_nh_));
   } else {
     path_following_ = PathFollowingFactory<CommandType>::make(
-      nh_, get_selected_lateral_control(nh_), get_selected_sliding_observer(nh_));
+      private_nh_,
+      get_selected_lateral_control(private_nh_),
+      get_selected_sliding_observer(private_nh_));
   }
 
-  if (get_debug(nh_)) {
-    logger_ = std::make_shared<core::SimpleFileLogger>(get_log_filename(nh_));
+  if (get_debug(private_nh_)) {
+    logger_ = std::make_shared<core::SimpleFileLogger>(get_log_filename(private_nh_));
     path_following_->registerLogger(logger_);
   }
 
-  command_limits_.store(get_command_limits<CommandLimits>(nh_));
-  auto interface_config = get_command_interface_configuration(ros::NodeHandle(nh_, "cmd_output"));
-  cmd_interface_ = std::make_unique<VehiculeInterface>(nh_, std::move(interface_config));
+  command_limits_.store(get_base_command_limits<CommandLimits>(private_nh_));
+  auto interface_config =
+    get_command_interface_configuration(ros::NodeHandle(private_nh_, "cmd_output"));
+  cmd_interface_ = std::make_unique<VehiculeInterface>(private_nh_, std::move(interface_config));
 
-  matching_sub_ =
-    nh_.subscribe("path_matching/info", 1, &PathFollowing::process_matching_info_, this);
+  matching_sub_ = nh_.subscribe("matching/info", 1, &PathFollowing::process_matching_info_, this);
 
   odometry_sub_ = nh_.subscribe("odometry", 1, &PathFollowing::process_odometry_, this);
 }

@@ -55,7 +55,7 @@ public:
   using OdometryMeasureMsg = typename CommandTraits<CommandType>::MeasureMsg;
 
 public:
-  explicit PathFollowing(ros::NodeHandle & nh);
+  explicit PathFollowing(ros::NodeHandle & nh, ros::NodeHandle & private_nh);
 
   void configure() override;
   void activate() override;
@@ -67,6 +67,7 @@ protected:
 
 protected:
   ros::NodeHandle nh_;
+  ros::NodeHandle private_nh_;
 
   std::unique_ptr<VehiculeInterface> cmd_interface_;
   ros::Subscriber matching_sub_;

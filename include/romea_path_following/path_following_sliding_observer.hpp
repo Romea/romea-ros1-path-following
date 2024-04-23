@@ -117,13 +117,14 @@ typename SlidingObserver::Parameters get_sliding_observer_parameters(const ros::
 }
 
 template<typename SlidingObserver>
-std::shared_ptr<SlidingObserver> make_sliding_observer(const ros::NodeHandle & nh)
+std::shared_ptr<SlidingObserver> make_sliding_observer(
+  const ros::NodeHandle & sliding_nh, const ros::NodeHandle & root_nh)
 {
   return std::make_shared<SlidingObserver>(
-    get_sampling_period(nh),
-    get_wheelbase(nh),
-    get_inertia(nh),
-    get_sliding_observer_parameters<SlidingObserver>(nh));
+    get_sampling_period(root_nh),
+    get_wheelbase(root_nh),
+    get_inertia(root_nh),
+    get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
 }
 
 }  // namespace ros1

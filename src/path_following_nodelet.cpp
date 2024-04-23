@@ -28,28 +28,31 @@ namespace ros1
 {
 
 void PathFollowingNodelet::onInit()
-{
-  auto & nh = getPrivateNodeHandle();
+try {
+  auto & nh = getNodeHandle();
+  auto & priv_nh = getPrivateNodeHandle();
 
-  auto mobile_base_type = load_param<std::string>(nh, "base/type");
+  auto mobile_base_type = load_param<std::string>(priv_nh, "base/type");
   auto command_type = core::get_command_type(mobile_base_type);
   if (command_type == "two_axle_steering") {
-    following_ = std::make_unique<PathFollowing<core::TwoAxleSteeringCommand>>(nh);
+    following_ = std::make_unique<PathFollowing<core::TwoAxleSteeringCommand>>(nh, priv_nh);
   } else if (command_type == "one_axle_steering") {
-    following_ = std::make_unique<PathFollowing<core::OneAxleSteeringCommand>>(nh);
+    following_ = std::make_unique<PathFollowing<core::OneAxleSteeringCommand>>(nh, priv_nh);
   } else if (command_type == "skid_steering") {
-    following_ = std::make_unique<PathFollowing<core::SkidSteeringCommand>>(nh);
+    following_ = std::make_unique<PathFollowing<core::SkidSteeringCommand>>(nh, priv_nh);
   } else {
     throw std::runtime_error("Mobile base type " + mobile_base_type + " is not supported");
   }
 
-  if (load_param_or<bool>(nh, "autoconfigure", false)) {
+  if (load_param_or<bool>(priv_nh, "autoconfigure", false)) {
     bool configured = on_configure();
 
-    if (load_param<bool>(nh, "autostart") && configured) {
+    if (load_param_or<bool>(priv_nh, "autostart", false) && configured) {
       on_activate();
     }
   }
+} catch (const std::exception & e) {
+  ROS_ERROR_STREAM("node initialization failed: " << e.what());
 }
 
 //-----------------------------------------------------------------------------
@@ -57,8 +60,9 @@ bool PathFollowingNodelet::on_configure()
 try {
   following_->configure();
 
-  ros::NodeHandle & nh = getPrivateNodeHandle();
-  joy_nh_ = ros::NodeHandle(nh, "joy");
+  ros::NodeHandle & nh = getNodeHandle();
+  ros::NodeHandle & priv_nh = getPrivateNodeHandle();
+  joy_nh_ = ros::NodeHandle(priv_nh, "joy");
   joystick_ = std::make_unique<Joystick>(nh, joy_nh_);
 
   joystick_->registerButtonCallback("start", JoystickButton::PRESSED, [this]() {
