@@ -29,9 +29,8 @@
 // local
 #include "romea_path_following/path_following_factory.hpp"
 
-namespace romea
-{
-namespace ros1
+
+namespace romea::ros1
 {
 
 
@@ -48,7 +47,7 @@ template<class CommandType>
 class PathFollowing : public PathFollowingBase
 {
 public:
-  using SetPoint = core::PathFollowingSetPoint;
+  using SetPoint = core::path_following::SetPoint;
   using VehiculeInterface = CommandInterface<CommandType>;
   using CommandLimits = typename CommandTraits<CommandType>::CommandLimits;
   using OdometryMeasure = typename CommandTraits<CommandType>::Measure;
@@ -76,12 +75,12 @@ protected:
   core::SharedVariable<SetPoint> setpoint_;
   core::SharedVariable<CommandLimits> command_limits_;
   core::SharedVariable<OdometryMeasure> odometry_measure_;
-  std::unique_ptr<core::PathFollowingBase<CommandType>> path_following_;
+  std::unique_ptr<core::path_following::PathFollowingBase<CommandType>> path_following_;
 
   std::shared_ptr<core::SimpleFileLogger> logger_;
 };
 
-}  // namespace ros1
-}  // namespace romea
+} // namespace romea::ros1
+
 
 #endif  // ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_HPP_

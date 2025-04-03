@@ -16,17 +16,15 @@
 #define ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_TRAITS_HPP_
 
 // romea
-#include "romea_core_path_following/PathFollowing.hpp"
-#include "romea_core_path_following/lateral_control/LateralControlBackStepping.hpp"
-#include "romea_core_path_following/lateral_control/LateralControlClassic.hpp"
-#include "romea_core_path_following/lateral_control/LateralControlPredictive.hpp"
-#include "romea_core_path_following/longitudinal_control/LongitudinalControlClassic.hpp"
-#include "romea_core_path_following/sliding_observer/SlidingObserverExtendedCinematicLinearTangent.hpp"
-#include "romea_core_path_following/sliding_observer/SlidingObserverExtendedCinematicLyapunov.hpp"
+#include <romea_core_path_following/lateral_control/back_stepping.hpp>
+#include <romea_core_path_following/lateral_control/classic.hpp>
+#include <romea_core_path_following/lateral_control/predictive.hpp>
+#include <romea_core_path_following/longitudinal_control/classic.hpp>
+#include <romea_core_path_following/path_following.hpp>
+#include <romea_core_path_following/sliding_observer/extended/cinematic_linear_tangent.hpp>
+#include <romea_core_path_following/sliding_observer/extended/cinematic_lyapunov.hpp>
 
-namespace romea
-{
-namespace ros1
+namespace romea::ros1
 {
 
 template<typename CommandType>
@@ -37,66 +35,67 @@ struct PathFollowingTraits
 template<>
 struct PathFollowingTraits<core::OneAxleSteeringCommand>
 {
-  using PathFollowingBase = core::PathFollowingBase<core::OneAxleSteeringCommand>;
+  using PathFollowingBase = core::path_following::PathFollowingBase<core::OneAxleSteeringCommand>;
 
   struct LongitudinalControl
   {
-    using Classic = core::PathFollowingLongitudinalControlClassic<core::OneAxleSteeringCommand>;
+    using Classic = core::path_following::LongitudinalControlClassic<core::OneAxleSteeringCommand>;
   };
 
   struct LateralControl
   {
-    using Classic = core::PathFollowingLateralControlClassic<core::OneAxleSteeringCommand>;
-    using Predictive = core::PathFollowingLateralControlPredictive<core::OneAxleSteeringCommand>;
+    using Classic = core::path_following::LateralControlClassic<core::OneAxleSteeringCommand>;
+    using Predictive = core::path_following::LateralControlPredictive<core::OneAxleSteeringCommand>;
   };
 
   struct SlidingObserver
   {
-    using ExtendedCinematic = core::PathFollowingSlidingObserverExtendedCinematicLinearTangent<
+    using ExtendedCinematic = core::path_following::SlidingObserverExtendedCinematicLinearTangent<
       core::OneAxleSteeringCommand>;
     using ExtendedLyapunov =
-      core::PathFollowingSlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>;
+      core::path_following::SlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>;
   };
 };
 
 template<>
 struct PathFollowingTraits<core::TwoAxleSteeringCommand>
 {
-  using PathFollowingBase = core::PathFollowingBase<core::TwoAxleSteeringCommand>;
+  using PathFollowingBase = core::path_following::PathFollowingBase<core::TwoAxleSteeringCommand>;
 
   struct LongitudinalControl
   {
-    using Classic = core::PathFollowingLongitudinalControlClassic<core::TwoAxleSteeringCommand>;
+    using Classic = core::path_following::LongitudinalControlClassic<core::TwoAxleSteeringCommand>;
   };
 
   struct LateralControl
   {
-    using Classic = core::PathFollowingLateralControlClassic<core::TwoAxleSteeringCommand>;
-    using Predictive = core::PathFollowingLateralControlPredictive<core::TwoAxleSteeringCommand>;
+    using Classic = core::path_following::LateralControlClassic<core::TwoAxleSteeringCommand>;
+    using Predictive = core::path_following::LateralControlPredictive<core::TwoAxleSteeringCommand>;
   };
 
   struct SlidingObserver
   {
-    using ExtendedCinematic = core::PathFollowingSlidingObserverExtendedCinematicLinearTangent<
+    using ExtendedCinematic = core::path_following::SlidingObserverExtendedCinematicLinearTangent<
       core::TwoAxleSteeringCommand>;
     using ExtendedLyapunov =
-      core::PathFollowingSlidingObserverExtendedCinematicLyapunov<core::TwoAxleSteeringCommand>;
+      core::path_following::SlidingObserverExtendedCinematicLyapunov<core::TwoAxleSteeringCommand>;
   };
 };
 
 template<>
 struct PathFollowingTraits<core::SkidSteeringCommand>
 {
-  using PathFollowingBase = core::PathFollowingBase<core::SkidSteeringCommand>;
+  using PathFollowingBase = core::path_following::PathFollowingBase<core::SkidSteeringCommand>;
 
   struct LongitudinalControl
   {
-    using Classic = core::PathFollowingLongitudinalControlClassic<core::SkidSteeringCommand>;
+    using Classic = core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>;
   };
 
   struct LateralControl
   {
-    using BackStepping = core::PathFollowingLateralControlBackStepping<core::SkidSteeringCommand>;
+    using BackStepping =
+      core::path_following::LateralControlBackStepping<core::SkidSteeringCommand>;
   };
 
   struct SlidingObserver
@@ -104,7 +103,6 @@ struct PathFollowingTraits<core::SkidSteeringCommand>
   };
 };
 
-}  // namespace ros1
-}  // namespace romea
+}  // namespace romea::ros1
 
 #endif  // ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_TRAITS_HPP_

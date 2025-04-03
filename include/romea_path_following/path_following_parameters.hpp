@@ -19,19 +19,18 @@
 #include <ros/ros.h>
 
 // romea
-#include "romea_core_path_following/PathFollowingSetPoint.hpp"
-#include "romea_mobile_base_utils/params/command_limits_parameters.hpp"
-#include "romea_mobile_base_utils/params/mobile_base_inertia_parameters.hpp"
+#include <romea_core_path_following/setpoint.hpp>
+#include <romea_mobile_base_utils/params/command_limits_parameters.hpp>
+#include <romea_mobile_base_utils/params/mobile_base_inertia_parameters.hpp>
 
-namespace romea
-{
-namespace ros1
+namespace romea::ros1
 {
 
 inline double get_sampling_period(const ros::NodeHandle & nh)
 {
   return load_param<double>(nh, "sampling_period");
 }
+
 inline bool get_one_steering_equivalence(const ros::NodeHandle & nh)
 {
   return load_param_or<bool>(nh, "one_steering_equivalence", false);
@@ -58,7 +57,7 @@ CommandLimits get_base_command_limits(const ros::NodeHandle & nh)
   return get_command_limits<CommandLimits>(ros::NodeHandle(nh, "base/command_limits"));
 }
 
-inline core::PathFollowingSetPoint get_setpoint(const ros::NodeHandle & nh)
+inline core::path_following::SetPoint get_setpoint(const ros::NodeHandle & nh)
 {
   return {
     load_param<double>(nh, "setpoint/desired_linear_speed"),
@@ -95,7 +94,6 @@ inline std::map<std::string, int> get_joystick_mapping(const ros::NodeHandle & n
   };
 }
 
-}  // namespace ros1
-}  // namespace romea
+}  // namespace romea::ros1
 
 #endif  // ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_PARAMETERS_HPP_

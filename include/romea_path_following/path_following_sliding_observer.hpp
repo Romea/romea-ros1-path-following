@@ -18,13 +18,11 @@
 // ros
 #include <ros/ros.h>
 
-#include "romea_core_path_following/sliding_observer/SlidingObserverExtendedCinematicLinearTangent.hpp"
-#include "romea_core_path_following/sliding_observer/SlidingObserverExtendedCinematicLyapunov.hpp"
-#include "romea_path_following/path_following_parameters.hpp"
+#include <romea_core_path_following/sliding_observer/extended/cinematic_linear_tangent.hpp>
+#include <romea_core_path_following/sliding_observer/extended/cinematic_lyapunov.hpp>
+#include <romea_path_following/path_following_parameters.hpp>
 
-namespace romea
-{
-namespace ros1
+namespace romea::ros1
 {
 
 template<typename Observer>
@@ -34,10 +32,10 @@ struct PathFollowingSlidingObserverParameters
 
 template<>
 struct PathFollowingSlidingObserverParameters<
-  core::PathFollowingSlidingObserverExtendedCinematicLinearTangent<core::OneAxleSteeringCommand>>
+  core::path_following::SlidingObserverExtendedCinematicLinearTangent<core::OneAxleSteeringCommand>>
 {
-  using Observer =
-    core::PathFollowingSlidingObserverExtendedCinematicLinearTangent<core::OneAxleSteeringCommand>;
+  using Observer = core::path_following::SlidingObserverExtendedCinematicLinearTangent<
+    core::OneAxleSteeringCommand>;
   using Parameters = Observer::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -54,10 +52,10 @@ struct PathFollowingSlidingObserverParameters<
 
 template<>
 struct PathFollowingSlidingObserverParameters<
-  core::PathFollowingSlidingObserverExtendedCinematicLinearTangent<core::TwoAxleSteeringCommand>>
+  core::path_following::SlidingObserverExtendedCinematicLinearTangent<core::TwoAxleSteeringCommand>>
 {
-  using Observer =
-    core::PathFollowingSlidingObserverExtendedCinematicLinearTangent<core::TwoAxleSteeringCommand>;
+  using Observer = core::path_following::SlidingObserverExtendedCinematicLinearTangent<
+    core::TwoAxleSteeringCommand>;
   using Parameters = Observer::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -74,10 +72,10 @@ struct PathFollowingSlidingObserverParameters<
 
 template<>
 struct PathFollowingSlidingObserverParameters<
-  core::PathFollowingSlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>>
+  core::path_following::SlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>>
 {
   using Observer =
-    core::PathFollowingSlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>;
+    core::path_following::SlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>;
   using Parameters = Observer::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -93,10 +91,10 @@ struct PathFollowingSlidingObserverParameters<
 
 template<>
 struct PathFollowingSlidingObserverParameters<
-  core::PathFollowingSlidingObserverExtendedCinematicLyapunov<core::TwoAxleSteeringCommand>>
+  core::path_following::SlidingObserverExtendedCinematicLyapunov<core::TwoAxleSteeringCommand>>
 {
   using Observer =
-    core::PathFollowingSlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>;
+    core::path_following::SlidingObserverExtendedCinematicLyapunov<core::OneAxleSteeringCommand>;
   using Parameters = Observer::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -127,7 +125,6 @@ std::shared_ptr<SlidingObserver> make_sliding_observer(
     get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
 }
 
-}  // namespace ros1
-}  // namespace romea
+}  // namespace romea::ros1
 
 #endif  // ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_SLIDING_OBSERVER_HPP_

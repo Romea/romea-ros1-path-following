@@ -18,14 +18,17 @@
 // ros
 #include <ros/ros.h>
 
-#include "romea_core_path_following/lateral_control/LateralControlBackStepping.hpp"
-#include "romea_core_path_following/lateral_control/LateralControlClassic.hpp"
-#include "romea_core_path_following/lateral_control/LateralControlPredictive.hpp"
+// romea
+#include <romea_common_utils/params/ros_param.hpp>
+#include <romea_core_path_following/lateral_control/back_stepping.hpp>
+#include <romea_core_path_following/lateral_control/classic.hpp>
+#include <romea_core_path_following/lateral_control/predictive.hpp>
+#include <romea_core_path_following/utils.hpp>
+
+// local
 #include "romea_path_following/path_following_parameters.hpp"
 
-namespace romea
-{
-namespace ros1
+namespace romea::ros1
 {
 
 template<typename LateralControl>
@@ -35,9 +38,9 @@ struct PathFollowingLateralControlParameters
 
 template<>
 struct PathFollowingLateralControlParameters<
-  core::PathFollowingLateralControlClassic<core::OneAxleSteeringCommand>>
+  core::path_following::LateralControlClassic<core::OneAxleSteeringCommand>>
 {
-  using LateralControl = core::PathFollowingLateralControlClassic<core::OneAxleSteeringCommand>;
+  using LateralControl = core::path_following::LateralControlClassic<core::OneAxleSteeringCommand>;
   using Parameters = LateralControl::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -48,9 +51,9 @@ struct PathFollowingLateralControlParameters<
 
 template<>
 struct PathFollowingLateralControlParameters<
-  core::PathFollowingLateralControlClassic<core::TwoAxleSteeringCommand>>
+  core::path_following::LateralControlClassic<core::TwoAxleSteeringCommand>>
 {
-  using LateralControl = core::PathFollowingLateralControlClassic<core::TwoAxleSteeringCommand>;
+  using LateralControl = core::path_following::LateralControlClassic<core::TwoAxleSteeringCommand>;
   using Parameters = LateralControl::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -63,9 +66,10 @@ struct PathFollowingLateralControlParameters<
 
 template<>
 struct PathFollowingLateralControlParameters<
-  core::PathFollowingLateralControlPredictive<core::OneAxleSteeringCommand>>
+  core::path_following::LateralControlPredictive<core::OneAxleSteeringCommand>>
 {
-  using LateralControl = core::PathFollowingLateralControlPredictive<core::OneAxleSteeringCommand>;
+  using LateralControl =
+    core::path_following::LateralControlPredictive<core::OneAxleSteeringCommand>;
   using Parameters = LateralControl::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -82,9 +86,10 @@ struct PathFollowingLateralControlParameters<
 
 template<>
 struct PathFollowingLateralControlParameters<
-  core::PathFollowingLateralControlPredictive<core::TwoAxleSteeringCommand>>
+  core::path_following::LateralControlPredictive<core::TwoAxleSteeringCommand>>
 {
-  using LateralControl = core::PathFollowingLateralControlPredictive<core::TwoAxleSteeringCommand>;
+  using LateralControl =
+    core::path_following::LateralControlPredictive<core::TwoAxleSteeringCommand>;
   using Parameters = LateralControl::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -102,9 +107,10 @@ struct PathFollowingLateralControlParameters<
 
 template<>
 struct PathFollowingLateralControlParameters<
-  core::PathFollowingLateralControlBackStepping<core::SkidSteeringCommand>>
+  core::path_following::LateralControlBackStepping<core::SkidSteeringCommand>>
 {
-  using LateralControl = core::PathFollowingLateralControlBackStepping<core::SkidSteeringCommand>;
+  using LateralControl =
+    core::path_following::LateralControlBackStepping<core::SkidSteeringCommand>;
   using Parameters = LateralControl::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
@@ -112,9 +118,7 @@ struct PathFollowingLateralControlParameters<
     return {
       {
         load_param<double>(nh, "gains/kp"),
-        load_param_or<double>(nh, "gains/ki", 0.0),
         load_param<double>(nh, "gains/kd"),
-        load_param_or<double>(nh, "gains/iclamp", 0.0),
       },
       load_param<double>(nh, "maximal_omega_d")};
   }
@@ -137,7 +141,6 @@ std::shared_ptr<LateralControl> make_lateral_control(
     get_lateral_control_parameters<LateralControl>(control_nh));
 }
 
-}  // namespace ros1
-}  // namespace romea
+}  // namespace romea::ros1
 
 #endif  // ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_LATERAL_CONTROL_HPP_

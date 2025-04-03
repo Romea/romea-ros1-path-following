@@ -20,9 +20,7 @@
 #include "romea_path_following/path_following.hpp"
 #include "romea_path_following/path_following_factory.hpp"
 
-namespace romea
-{
-namespace ros1
+namespace romea::ros1
 {
 //-----------------------------------------------------------------------------
 template<class CommandType>
@@ -51,7 +49,7 @@ void PathFollowing<CommandType>::configure()
 
   if (get_debug(private_nh_)) {
     logger_ = std::make_shared<core::SimpleFileLogger>(get_log_filename(private_nh_));
-    path_following_->registerLogger(logger_);
+    path_following_->register_logger(logger_);
   }
 
   command_limits_.store(get_base_command_limits<CommandLimits>(private_nh_));
@@ -94,7 +92,7 @@ void PathFollowing<CommandType>::process_matching_info_(
   std::vector<core::PathMatchedPoint2D> matchedPoints = romea::to_romea(msg.matched_points);
 
   if (cmd_interface_->is_started()) {
-    auto command = path_following_->computeCommand(
+    auto command = path_following_->compute_command(
       setpoint_.load(),
       command_limits_.load(),
       matchedPoints,
@@ -118,5 +116,5 @@ template class PathFollowing<core::TwoAxleSteeringCommand>;
 template class PathFollowing<core::OneAxleSteeringCommand>;
 template class PathFollowing<core::SkidSteeringCommand>;
 
-}  // namespace ros1
-}  // namespace romea
+} // namespace romea::ros1
+

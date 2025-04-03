@@ -19,11 +19,9 @@
 #include <ros/ros.h>
 
 // romea
-#include <romea_core_path_following/longitudinal_control/LongitudinalControlClassic.hpp>
+#include <romea_core_path_following/longitudinal_control/classic.hpp>
 
-namespace romea
-{
-namespace ros1
+namespace romea::ros1
 {
 
 template<typename LongitudinalControl>
@@ -33,32 +31,34 @@ struct PathFollowingLongitudinalControlParameters
 
 template<>
 struct PathFollowingLongitudinalControlParameters<
-  core::PathFollowingLongitudinalControlClassic<core::OneAxleSteeringCommand>>
+  core::path_following::LongitudinalControlClassic<core::OneAxleSteeringCommand>>
 {
-  using Longitudinal = core::PathFollowingLongitudinalControlClassic<core::OneAxleSteeringCommand>;
+  using Longitudinal =
+    core::path_following::LongitudinalControlClassic<core::OneAxleSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
 
-  static Parameters get(ros::NodeHandle /*nh*/) { return {}; }
+  static Parameters get(const ros::NodeHandle & /*nh*/) { return {}; }
 };
 
 template<>
 struct PathFollowingLongitudinalControlParameters<
-  core::PathFollowingLongitudinalControlClassic<core::TwoAxleSteeringCommand>>
+  core::path_following::LongitudinalControlClassic<core::TwoAxleSteeringCommand>>
 {
-  using Longitudinal = core::PathFollowingLongitudinalControlClassic<core::TwoAxleSteeringCommand>;
+  using Longitudinal =
+    core::path_following::LongitudinalControlClassic<core::TwoAxleSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
 
-  static Parameters get(ros::NodeHandle /*nh*/) { return {}; }
+  static Parameters get(const ros::NodeHandle & /*nh*/) { return {}; }
 };
 
 template<>
 struct PathFollowingLongitudinalControlParameters<
-  core::PathFollowingLongitudinalControlClassic<core::SkidSteeringCommand>>
+  core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>>
 {
-  using Longitudinal = core::PathFollowingLongitudinalControlClassic<core::SkidSteeringCommand>;
+  using Longitudinal = core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
 
-  static Parameters get(ros::NodeHandle /*nh*/) { return {}; }
+  static Parameters get(const ros::NodeHandle & /*nh*/) { return {}; }
 };
 
 template<typename LongitudinalControl>
@@ -69,14 +69,12 @@ typename LongitudinalControl::Parameters get_longitudinal_control_parameters(
 }
 
 template<typename LongitudinalControl>
-std::shared_ptr<LongitudinalControl> make_longitudinal_control(
-  const ros::NodeHandle & nh)
+std::shared_ptr<LongitudinalControl> make_longitudinal_control(const ros::NodeHandle & nh)
 {
   return std::make_shared<LongitudinalControl>(
     get_longitudinal_control_parameters<LongitudinalControl>(nh));
 }
 
-}  // namespace ros1
-}  // namespace romea
+}  // namespace romea::ros1
 
 #endif  // ROMEA_PATH_FOLLOWING__PATH_FOLLOWING_LONGITUDINAL_CONTROL_HPP_
