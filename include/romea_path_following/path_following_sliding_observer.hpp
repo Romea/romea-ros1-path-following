@@ -18,9 +18,15 @@
 // ros
 #include <ros/ros.h>
 
+#include <romea_core_mobile_base/kinematic/skid_steering/SkidSteeringCommand.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_linear_tangent.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_lyapunov.hpp>
-#include <romea_path_following/path_following_parameters.hpp>
+#include <romea_core_path_following/sliding_observer/skid/picard_backstepping.hpp>
+#include <romea_core_path_following/sliding_observer/skid/picard_lyapunov.hpp>
+
+// local
+#include "romea_path_following/path_following_parameters.hpp"
+#include "romea_path_following/path_following_traits.hpp"
 
 namespace romea::ros1
 {
@@ -108,6 +114,50 @@ struct PathFollowingSlidingObserverParameters<
   }
 };
 
+template<>
+struct PathFollowingSlidingObserverParameters<
+  core::path_following::SlidingObserverPicardSkidBackstepping<core::SkidSteeringCommand>>
+{
+  using Observer =
+    core::path_following::SlidingObserverPicardSkidBackstepping<core::SkidSteeringCommand>;
+  using Parameters = Observer::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {
+      load_param<double>(nh, "gains/lateral_kp"),
+      load_param<double>(nh, "gains/course_kp"),
+      load_param<double>(nh, "gains/longitudinal_kp"),
+      load_param<double>(nh, "gains/longitudinal_ki"),
+      load_param<double>(nh, "filter_weights/slip_angle"),
+      load_param<double>(nh, "filter_weights/linear_speed_disturb"),
+      load_param<double>(nh, "filter_weights/angular_speed_disturb"),
+    };
+  }
+};
+
+template<>
+struct PathFollowingSlidingObserverParameters<
+  core::path_following::SlidingObserverPicardSkidLyapunov<core::SkidSteeringCommand>>
+{
+  using Observer =
+    core::path_following::SlidingObserverPicardSkidLyapunov<core::SkidSteeringCommand>;
+  using Parameters = Observer::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {
+      load_param<double>(nh, "gains/position_x_kp"),
+      load_param<double>(nh, "gains/position_x_ki"),
+      load_param<double>(nh, "gains/position_y_kp"),
+      load_param<double>(nh, "gains/course_kp"),
+      load_param<double>(nh, "gains/slip_angle_kp"),
+      load_param<double>(nh, "gains/linear_speed_disturb_kp"),
+      load_param<double>(nh, "gains/angular_speed_disturb_kp"),
+    };
+  }
+};
+
 template<typename SlidingObserver>
 typename SlidingObserver::Parameters get_sliding_observer_parameters(const ros::NodeHandle & nh)
 {
@@ -118,11 +168,24 @@ template<typename SlidingObserver>
 std::shared_ptr<SlidingObserver> make_sliding_observer(
   const ros::NodeHandle & sliding_nh, const ros::NodeHandle & root_nh)
 {
-  return std::make_shared<SlidingObserver>(
-    get_sampling_period(root_nh),
-    get_wheelbase(root_nh),
-    get_inertia(root_nh),
-    get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
+  using Command = core::SkidSteeringCommand;
+  using SOPSBackstepping = PathFollowingTraits<Command>::SlidingObserver::PicardSkidBackstepping;
+  using SOPSLyapunov = PathFollowingTraits<Command>::SlidingObserver::PicardSkidLyapunov;
+
+  if constexpr (
+    std::is_same_v<SlidingObserver, SOPSBackstepping> ||
+    std::is_same_v<SlidingObserver, SOPSLyapunov>) {
+    return std::make_shared<SlidingObserver>(
+      get_sampling_period(root_nh), get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
+  }
+
+  else {
+    return std::make_shared<SlidingObserver>(
+      get_sampling_period(root_nh),
+      get_wheelbase(root_nh),
+      get_inertia(root_nh),
+      get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
+  }
 }
 
 }  // namespace romea::ros1

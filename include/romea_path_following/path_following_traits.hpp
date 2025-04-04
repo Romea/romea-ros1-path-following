@@ -18,11 +18,15 @@
 // romea
 #include <romea_core_path_following/lateral_control/back_stepping.hpp>
 #include <romea_core_path_following/lateral_control/classic.hpp>
+#include <romea_core_path_following/lateral_control/front_rear_decoupled.hpp>
 #include <romea_core_path_following/lateral_control/predictive.hpp>
+#include <romea_core_path_following/lateral_control/skid_backstepping.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
 #include <romea_core_path_following/path_following.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_linear_tangent.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_lyapunov.hpp>
+#include <romea_core_path_following/sliding_observer/skid/picard_backstepping.hpp>
+#include <romea_core_path_following/sliding_observer/skid/picard_lyapunov.hpp>
 
 namespace romea::ros1
 {
@@ -71,6 +75,8 @@ struct PathFollowingTraits<core::TwoAxleSteeringCommand>
   {
     using Classic = core::path_following::LateralControlClassic<core::TwoAxleSteeringCommand>;
     using Predictive = core::path_following::LateralControlPredictive<core::TwoAxleSteeringCommand>;
+    using FrontRearDecoupled =
+      core::path_following::LateralControlFrontRearDecoupled<core::TwoAxleSteeringCommand>;
   };
 
   struct SlidingObserver
@@ -96,10 +102,16 @@ struct PathFollowingTraits<core::SkidSteeringCommand>
   {
     using BackStepping =
       core::path_following::LateralControlBackStepping<core::SkidSteeringCommand>;
+    using SkidBackstepping =
+      core::path_following::LateralControlSkidBackstepping<core::SkidSteeringCommand>;
   };
 
   struct SlidingObserver
   {
+    using PicardSkidBackstepping =
+      core::path_following::SlidingObserverPicardSkidBackstepping<core::SkidSteeringCommand>;
+    using PicardSkidLyapunov =
+      core::path_following::SlidingObserverPicardSkidLyapunov<core::SkidSteeringCommand>;
   };
 };
 

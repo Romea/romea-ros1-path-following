@@ -22,7 +22,9 @@
 #include <romea_common_utils/params/ros_param.hpp>
 #include <romea_core_path_following/lateral_control/back_stepping.hpp>
 #include <romea_core_path_following/lateral_control/classic.hpp>
+#include <romea_core_path_following/lateral_control/front_rear_decoupled.hpp>
 #include <romea_core_path_following/lateral_control/predictive.hpp>
+#include <romea_core_path_following/lateral_control/skid_backstepping.hpp>
 #include <romea_core_path_following/utils.hpp>
 
 // local
@@ -95,13 +97,34 @@ struct PathFollowingLateralControlParameters<
   static Parameters get(const ros::NodeHandle & nh)
   {
     return {
-      {load_param<double>(nh, "gains/front_kd"),
-       load_param_or<double>(nh, "gains/rear_kd", std::numeric_limits<double>::quiet_NaN())},
+      {
+        load_param<double>(nh, "gains/front_kd"),
+        load_param_or<double>(nh, "gains/rear_kd", std::numeric_limits<double>::quiet_NaN()),
+      },
       load_param<int>(nh, "prediction/horizon"),
       load_param<double>(nh, "prediction/a0"),
       load_param<double>(nh, "prediction/a1"),
       load_param<double>(nh, "prediction/b1"),
       load_param<double>(nh, "prediction/b2")};
+  }
+};
+
+template<>
+struct PathFollowingLateralControlParameters<
+  core::path_following::LateralControlFrontRearDecoupled<core::TwoAxleSteeringCommand>>
+{
+  using LateralControl =
+    core::path_following::LateralControlFrontRearDecoupled<core::TwoAxleSteeringCommand>;
+  using Parameters = LateralControl::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {
+      {
+        load_param<double>(nh, "gains/front_kp"),
+        load_param<double>(nh, "gains/rear_kp"),
+      },
+    };
   }
 };
 
@@ -122,6 +145,26 @@ struct PathFollowingLateralControlParameters<
       },
       load_param<double>(nh, "maximal_omega_d")};
   }
+};
+
+template<>
+struct PathFollowingLateralControlParameters<
+  core::path_following::LateralControlSkidBackstepping<core::SkidSteeringCommand>>
+{
+  using LateralControl =
+    core::path_following::LateralControlSkidBackstepping<core::SkidSteeringCommand>;
+  using Parameters = LateralControl::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {
+      {
+        load_param<double>(nh, "gains/lateral_kp"),
+        load_param<double>(nh, "gains/course_kp"),
+      },
+      load_param<double>(nh, "maximal_target_course_deg") * M_PI / 180.,
+    };
+  };
 };
 
 template<typename LateralControl>

@@ -95,7 +95,9 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
     if (lateral_control_name == "predictive") {
       return make<LatCtrlPredictive>(nh, lateral_control_name, sliding_observer_name);
     }
-    throw std::runtime_error("Unknown lateral_control algorithm '" + lateral_control_name + "'");
+    throw std::runtime_error(
+      std::string{"Unknown lateral_control '"} + lateral_control_name +
+      "'. Available: [classic, predictive]");
   }
 
   template<typename LatCtrl>
@@ -117,22 +119,23 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
       return make_path_following<LatCtrl, LonCtrl, SlObsExtendedLyapunov>(
         nh, lateral_control_name, "", sliding_observer_name);
     }
-    throw std::runtime_error("Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
+    throw std::runtime_error(
+      std::string{"Unknown sliding_observer '"} + sliding_observer_name +
+      "'. Available: [none, extended_cinematic, extended_lyapunov]");
   }
 };
 
 template<>
 struct PathFollowingFactory<core::TwoAxleSteeringCommand>
 {
-  using Base = PathFollowingTraits<core::TwoAxleSteeringCommand>::PathFollowingBase;
-  using LonCtrl = PathFollowingTraits<core::TwoAxleSteeringCommand>::LongitudinalControl::Classic;
-  using LatCtrlClassic = PathFollowingTraits<core::TwoAxleSteeringCommand>::LateralControl::Classic;
-  using LatCtrlPredictive =
-    PathFollowingTraits<core::TwoAxleSteeringCommand>::LateralControl::Predictive;
-  using SlObsExtendedCinematic =
-    PathFollowingTraits<core::TwoAxleSteeringCommand>::SlidingObserver::ExtendedCinematic;
-  using SlObsExtendedLyapunov =
-    PathFollowingTraits<core::TwoAxleSteeringCommand>::SlidingObserver::ExtendedLyapunov;
+  using Command = core::TwoAxleSteeringCommand;
+  using Base = PathFollowingTraits<Command>::PathFollowingBase;
+  using LonCtrl = PathFollowingTraits<Command>::LongitudinalControl::Classic;
+  using LatCtrlClassic = PathFollowingTraits<Command>::LateralControl::Classic;
+  using LatCtrlPredictive = PathFollowingTraits<Command>::LateralControl::Predictive;
+  using LatCtrlDecoupled = PathFollowingTraits<Command>::LateralControl::FrontRearDecoupled;
+  using SlObsExtendedCinematic = PathFollowingTraits<Command>::SlidingObserver::ExtendedCinematic;
+  using SlObsExtendedLyapunov = PathFollowingTraits<Command>::SlidingObserver::ExtendedLyapunov;
 
   static std::unique_ptr<Base> make(
     const ros::NodeHandle & nh,
@@ -145,7 +148,12 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
     if (lateral_control_name == "predictive") {
       return make<LatCtrlPredictive>(nh, lateral_control_name, sliding_observer_name);
     }
-    throw std::runtime_error("Unknown lateral_control algorithm '" + lateral_control_name + "'");
+    if (lateral_control_name == "front_rear_decoupled") {
+      return make<LatCtrlDecoupled>(nh, lateral_control_name, sliding_observer_name);
+    }
+    throw std::runtime_error(
+      std::string{"Unknown lateral_control '"} + lateral_control_name +
+      "'. Available: [classic, predictive, front_rear_decoupled]");
   }
 
   template<typename LatCtrl>
@@ -167,17 +175,22 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
       return make_path_following<LatCtrl, LonCtrl, SlObsExtendedLyapunov>(
         nh, lateral_control_name, "", sliding_observer_name);
     }
-    throw std::runtime_error("Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
+    throw std::runtime_error(
+      std::string{"Unknown sliding_observer '"} + sliding_observer_name +
+      "'. Available: [none, extended_cinematic, extended_lyapunov]");
   }
 };
 
 template<>
 struct PathFollowingFactory<core::SkidSteeringCommand>
 {
-  using Base = PathFollowingTraits<core::SkidSteeringCommand>::PathFollowingBase;
-  using LonCtrl = PathFollowingTraits<core::SkidSteeringCommand>::LongitudinalControl::Classic;
-  using LatCtrlBackStepping =
-    PathFollowingTraits<core::SkidSteeringCommand>::LateralControl::BackStepping;
+  using Command = core::SkidSteeringCommand;
+  using Base = PathFollowingTraits<Command>::PathFollowingBase;
+  using LonCtrl = PathFollowingTraits<Command>::LongitudinalControl::Classic;
+  using LatCtrlBackStepping = PathFollowingTraits<Command>::LateralControl::BackStepping;
+  using LatCtrlSkidBs = PathFollowingTraits<Command>::LateralControl::SkidBackstepping;
+  using SOPSBackstepping = PathFollowingTraits<Command>::SlidingObserver::PicardSkidBackstepping;
+  using SOPSLyapunov = PathFollowingTraits<Command>::SlidingObserver::PicardSkidLyapunov;
 
   static std::unique_ptr<Base> make(
     const ros::NodeHandle & nh,
@@ -185,19 +198,37 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
     const std::string & sliding_observer_name,
     bool one_axle_steering_equivalence = false)
   {
-    if (!one_axle_steering_equivalence) {
-      if (lateral_control_name == "back_stepping") {
-        if (sliding_observer_name == "none") {
-          return make_path_following<LatCtrlBackStepping, LonCtrl>(nh, lateral_control_name, "");
-        }
-        throw std::runtime_error(
-          "Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
-      }
-      throw std::runtime_error("Unknown lateral_control algorithm '" + lateral_control_name + "'");
+    if (one_axle_steering_equivalence) {
+      return std::make_unique<core::path_following::OneAxleSteeringEquivalence>(
+        PathFollowingFactory<core::OneAxleSteeringCommand>::make(
+          nh, lateral_control_name, sliding_observer_name));
     }
-    return std::make_unique<core::path_following::OneAxleSteeringEquivalence>(
-      PathFollowingFactory<core::OneAxleSteeringCommand>::make(
-        nh, lateral_control_name, sliding_observer_name));
+    if (lateral_control_name == "back_stepping") {
+      if (sliding_observer_name == "none") {
+        return make_path_following<LatCtrlBackStepping, LonCtrl>(nh, lateral_control_name, "");
+      }
+      throw std::runtime_error(
+        "Unknown sliding_observer algorithm '" + sliding_observer_name + "'");
+    }
+    if (lateral_control_name == "skid_backstepping") {
+      if (sliding_observer_name == "none") {
+        return make_path_following<LatCtrlSkidBs, LonCtrl>(nh, lateral_control_name, "");
+      }
+      if (sliding_observer_name == "picard_skid_backstepping") {
+        return make_path_following<LatCtrlSkidBs, LonCtrl, SOPSBackstepping>(
+          nh, lateral_control_name, "", sliding_observer_name);
+      }
+      if (sliding_observer_name == "picard_skid_lyapunov") {
+        return make_path_following<LatCtrlSkidBs, LonCtrl, SOPSLyapunov>(
+          nh, lateral_control_name, "", sliding_observer_name);
+      }
+      throw std::runtime_error(
+        std::string{"Unknown sliding_observer '"} + sliding_observer_name +
+        "'. Available: [none, picard_skid_backstepping, picard_skid_lyapunov]");
+    }
+    throw std::runtime_error(
+      std::string{"Unknown lateral_control '"} + lateral_control_name +
+      "'. Available: [back_stepping, skid_backstepping]");
   }
 };
 
