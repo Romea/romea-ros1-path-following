@@ -19,6 +19,7 @@
 #include <ros/ros.h>
 
 // romea
+#include <romea_common_utils/params/ros_param.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
 
 namespace romea::ros1
@@ -37,7 +38,10 @@ struct PathFollowingLongitudinalControlParameters<
     core::path_following::LongitudinalControlClassic<core::OneAxleSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
 
-  static Parameters get(const ros::NodeHandle & /*nh*/) { return {}; }
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {load_param_or(nh, "minimal_linear_speed", 0.3)};
+  }
 };
 
 template<>
@@ -48,7 +52,10 @@ struct PathFollowingLongitudinalControlParameters<
     core::path_following::LongitudinalControlClassic<core::TwoAxleSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
 
-  static Parameters get(const ros::NodeHandle & /*nh*/) { return {}; }
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {load_param_or(nh, "minimal_linear_speed", 0.3)};
+  }
 };
 
 template<>
@@ -58,7 +65,10 @@ struct PathFollowingLongitudinalControlParameters<
   using Longitudinal = core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
 
-  static Parameters get(const ros::NodeHandle & /*nh*/) { return {}; }
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {load_param_or(nh, "minimal_linear_speed", 0.3)};
+  }
 };
 
 template<typename LongitudinalControl>
