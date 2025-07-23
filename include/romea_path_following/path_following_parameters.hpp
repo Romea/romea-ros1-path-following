@@ -43,7 +43,7 @@ inline std::string get_base_type(const ros::NodeHandle & nh)
 
 inline double get_wheelbase(const ros::NodeHandle & nh)
 {
-  return load_param_or<double>(nh, "base/wheelbase", 1.2);
+  return load_param_or<double>(nh, "base/wheelbase", 2.0);
 }
 
 inline core::MobileBaseInertia get_inertia(const ros::NodeHandle & nh)
