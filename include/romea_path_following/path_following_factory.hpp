@@ -18,6 +18,7 @@
 // romea
 #include "romea_path_following/path_following_lateral_control.hpp"
 #include "romea_path_following/path_following_longitudinal_control.hpp"
+#include "romea_path_following/path_following_parameters.hpp"
 #include "romea_path_following/path_following_sliding_observer.hpp"
 #include "romea_path_following/path_following_traits.hpp"
 
@@ -201,7 +202,8 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
     if (one_axle_steering_equivalence) {
       return std::make_unique<core::path_following::OneAxleSteeringEquivalence>(
         PathFollowingFactory<core::OneAxleSteeringCommand>::make(
-          nh, lateral_control_name, sliding_observer_name));
+          nh, lateral_control_name, sliding_observer_name),
+        get_wheelbase(nh));
     }
     if (lateral_control_name == "back_stepping") {
       if (sliding_observer_name == "none") {
