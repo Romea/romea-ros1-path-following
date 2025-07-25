@@ -176,12 +176,11 @@ std::shared_ptr<SlidingObserver> make_sliding_observer(
     std::is_same_v<SlidingObserver, SOPSBackstepping> ||
     std::is_same_v<SlidingObserver, SOPSLyapunov>) {
     return std::make_shared<SlidingObserver>(
-      get_sampling_period(root_nh), get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
+      get_sliding_observer_parameters<SlidingObserver>(sliding_nh));
   }
 
   else {
     return std::make_shared<SlidingObserver>(
-      get_sampling_period(root_nh),
       get_wheelbase(root_nh),
       get_inertia(root_nh),
       get_sliding_observer_parameters<SlidingObserver>(sliding_nh));

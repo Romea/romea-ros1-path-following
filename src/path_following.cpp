@@ -14,6 +14,8 @@
 
 // romea
 #include <romea_common_utils/params/algorithm_parameters.hpp>
+#include <romea_common_utils/conversions/time_conversions.hpp>
+#include <romea_core_common/time/Time.hpp>
 #include <romea_mobile_base_utils/params/command_interface_parameters.hpp>
 
 // local
@@ -91,8 +93,11 @@ void PathFollowing<CommandType>::process_matching_info_(
   core::Twist2D filtered_twist = romea::to_romea(msg.twist);
   std::vector<core::PathMatchedPoint2D> matchedPoints = romea::to_romea(msg.matched_points);
 
+  core::TimePoint stamp = to_romea_time(msg.header.stamp);
+
   if (cmd_interface_->is_started()) {
     auto command = path_following_->compute_command(
+      stamp,
       setpoint_.load(),
       command_limits_.load(),
       matchedPoints,
