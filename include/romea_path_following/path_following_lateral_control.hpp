@@ -25,6 +25,8 @@
 #include <romea_core_path_following/lateral_control/front_rear_decoupled.hpp>
 #include <romea_core_path_following/lateral_control/predictive.hpp>
 #include <romea_core_path_following/lateral_control/skid_backstepping.hpp>
+#include <romea_core_path_following/lateral_control/desbos_generic.hpp>
+#include <romea_core_path_following/lateral_control/desbos_generic_predictive.hpp>
 #include <romea_core_path_following/utils.hpp>
 
 // local
@@ -165,6 +167,58 @@ struct PathFollowingLateralControlParameters<
       load_param<double>(nh, "maximal_target_course_deg") * M_PI / 180.,
     };
   };
+};
+
+template<>
+struct PathFollowingLateralControlParameters<
+  core::path_following::LateralControlDesbosGeneric<core::SkidSteeringCommand>>
+{
+  using LateralControl =
+    core::path_following::LateralControlDesbosGeneric<core::SkidSteeringCommand>;
+  using Parameters = LateralControl::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {
+      {
+        load_param<double>(nh, "gains/lateral_kp"),
+        load_param<double>(nh, "gains/course_kp"),
+        load_param<double>(nh, "gains/longitudinal_kp"),
+      },
+      load_param<bool>(nh, "use_adaptive_gains"),
+    };
+  };
+};
+
+
+template<>
+struct PathFollowingLateralControlParameters<
+  core::path_following::LateralControlDesbosGenericPredictive<core::SkidSteeringCommand>>
+{
+  using LateralControl =
+    core::path_following::LateralControlDesbosGenericPredictive<core::SkidSteeringCommand>;
+  using Parameters = LateralControl::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    constexpr auto nan = std::numeric_limits<double>::quiet_NaN();
+    return {
+      {
+        load_param<double>(nh, "gains/lateral_kp"),
+        load_param<double>(nh, "gains/course_kp"),
+        load_param_or<double>(nh, "gains/longitudinal_kp", nan),
+      },
+      load_param<double>(nh, "alpha"),
+      load_param<double>(nh, "prediction/a0"),
+      load_param<double>(nh, "prediction/a1"),
+      load_param<double>(nh, "prediction/b1"),
+      load_param<double>(nh, "prediction/b2"),
+      load_param<int>(nh, "prediction/horizon"),
+      load_param<bool>(nh, "use_adaptive_gains"),
+      load_param<bool>(nh, "use_lmpc"),
+      load_param<int>(nh, "lmpc_model_order"),
+    };
+  }
 };
 
 template<typename LateralControl>
