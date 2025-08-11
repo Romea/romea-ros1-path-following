@@ -179,11 +179,12 @@ struct PathFollowingLateralControlParameters<
 
   static Parameters get(const ros::NodeHandle & nh)
   {
+    constexpr auto nan = std::numeric_limits<double>::quiet_NaN();
     return {
       {
         load_param<double>(nh, "gains/lateral_kp"),
         load_param<double>(nh, "gains/course_kp"),
-        load_param<double>(nh, "gains/longitudinal_kp"),
+        load_param_or<double>(nh, "gains/longitudinal_kp", nan),
       },
       load_param<bool>(nh, "use_adaptive_gains"),
     };
