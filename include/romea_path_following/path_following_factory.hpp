@@ -225,7 +225,8 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
     }
     throw std::runtime_error(
       std::string{"Unknown lateral_control '"} + lateral_control_name +
-      "'. Available: [back_stepping, skid_backstepping]");
+      "'. Available: [back_stepping, skid_backstepping, desbos_generic, "
+      "desbos_generic_predictive]");
   }
 
   template<typename LatCtrl>
