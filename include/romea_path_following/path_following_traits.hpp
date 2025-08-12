@@ -18,12 +18,13 @@
 // romea
 #include <romea_core_path_following/lateral_control/back_stepping.hpp>
 #include <romea_core_path_following/lateral_control/classic.hpp>
+#include <romea_core_path_following/lateral_control/desbos_generic.hpp>
+#include <romea_core_path_following/lateral_control/desbos_generic_predictive.hpp>
 #include <romea_core_path_following/lateral_control/front_rear_decoupled.hpp>
 #include <romea_core_path_following/lateral_control/predictive.hpp>
 #include <romea_core_path_following/lateral_control/skid_backstepping.hpp>
-#include <romea_core_path_following/lateral_control/desbos_generic.hpp>
-#include <romea_core_path_following/lateral_control/desbos_generic_predictive.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
+#include <romea_core_path_following/longitudinal_control/lenain_curvature_transition.hpp>
 #include <romea_core_path_following/path_following.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_linear_tangent.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_lyapunov.hpp>
@@ -46,6 +47,9 @@ struct PathFollowingTraits<core::OneAxleSteeringCommand>
   struct LongitudinalControl
   {
     using Classic = core::path_following::LongitudinalControlClassic<core::OneAxleSteeringCommand>;
+    using LenainCurvatureTransition =
+      core::path_following::LongitudinalControlLenainCurvatureTransition<
+        core::OneAxleSteeringCommand>;
   };
 
   struct LateralControl
@@ -71,6 +75,9 @@ struct PathFollowingTraits<core::TwoAxleSteeringCommand>
   struct LongitudinalControl
   {
     using Classic = core::path_following::LongitudinalControlClassic<core::TwoAxleSteeringCommand>;
+    using LenainCurvatureTransition =
+      core::path_following::LongitudinalControlLenainCurvatureTransition<
+        core::TwoAxleSteeringCommand>;
   };
 
   struct LateralControl
@@ -98,6 +105,9 @@ struct PathFollowingTraits<core::SkidSteeringCommand>
   struct LongitudinalControl
   {
     using Classic = core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>;
+    using LenainCurvatureTransition =
+      core::path_following::LongitudinalControlLenainCurvatureTransition<
+        core::SkidSteeringCommand>;
   };
 
   struct LateralControl

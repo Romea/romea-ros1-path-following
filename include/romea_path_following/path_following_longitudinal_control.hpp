@@ -21,6 +21,7 @@
 // romea
 #include <romea_common_utils/params/ros_param.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
+#include <romea_core_path_following/longitudinal_control/lenain_curvature_transition.hpp>
 
 namespace romea::ros1
 {
@@ -64,6 +65,19 @@ struct PathFollowingLongitudinalControlParameters<
 {
   using Longitudinal = core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>;
   using Parameters = Longitudinal::Parameters;
+
+  static Parameters get(const ros::NodeHandle & nh)
+  {
+    return {load_param_or(nh, "minimal_linear_speed", 0.3)};
+  }
+};
+
+template<typename Command>
+struct PathFollowingLongitudinalControlParameters<
+  core::path_following::LongitudinalControlLenainCurvatureTransition<Command>>
+{
+  using Longitudinal = core::path_following::LongitudinalControlLenainCurvatureTransition<Command>;
+  using Parameters = typename Longitudinal::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
   {

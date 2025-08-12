@@ -39,12 +39,14 @@ void PathFollowing<CommandType>::configure()
   if constexpr (std::is_same_v<CommandType, core::SkidSteeringCommand>) {
     path_following_ = PathFollowingFactory<CommandType>::make(
       private_nh_,
+      get_selected_longitudinal_control(private_nh_),
       get_selected_lateral_control(private_nh_),
       get_selected_sliding_observer(private_nh_),
       get_one_steering_equivalence(private_nh_));
   } else {
     path_following_ = PathFollowingFactory<CommandType>::make(
       private_nh_,
+      get_selected_longitudinal_control(private_nh_),
       get_selected_lateral_control(private_nh_),
       get_selected_sliding_observer(private_nh_));
   }

@@ -66,6 +66,11 @@ inline core::path_following::SetPoint get_setpoint(const ros::NodeHandle & nh)
   };
 }
 
+inline std::string get_selected_longitudinal_control(const ros::NodeHandle & nh)
+{
+  return load_param<std::string>(nh, "longitudinal_control/selected");
+}
+
 inline std::string get_selected_lateral_control(const ros::NodeHandle & nh)
 {
   return load_param<std::string>(nh, "lateral_control/selected");
