@@ -21,7 +21,7 @@
 // romea
 #include <romea_common_utils/params/ros_param.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
-#include <romea_core_path_following/longitudinal_control/lenain_curvature_transition.hpp>
+#include <romea_core_path_following/longitudinal_control/curvature_transition.hpp>
 
 namespace romea::ros1
 {
@@ -74,9 +74,9 @@ struct PathFollowingLongitudinalControlParameters<
 
 template<typename Command>
 struct PathFollowingLongitudinalControlParameters<
-  core::path_following::LongitudinalControlLenainCurvatureTransition<Command>>
+  core::path_following::LongitudinalControlCurvatureTransition<Command>>
 {
-  using Longitudinal = core::path_following::LongitudinalControlLenainCurvatureTransition<Command>;
+  using Longitudinal = core::path_following::LongitudinalControlCurvatureTransition<Command>;
   using Parameters = typename Longitudinal::Parameters;
 
   static Parameters get(const ros::NodeHandle & nh)
