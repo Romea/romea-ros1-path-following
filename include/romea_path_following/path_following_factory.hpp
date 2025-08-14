@@ -77,6 +77,7 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
 {
   using Traits = PathFollowingTraits<core::OneAxleSteeringCommand>;
   using Base = Traits::PathFollowingBase;
+  using LonCtrlConstant = Traits::LongitudinalControl::Constant;
   using LonCtrlClassic = Traits::LongitudinalControl::Classic;
   using LonCtrlCurvTrans = Traits::LongitudinalControl::CurvatureTransition;
   using LatCtrlClassic = Traits::LateralControl::Classic;
@@ -90,6 +91,9 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
     const std::string & lateral_control,
     const std::string & sliding_observer)
   {
+    if (longi_control == "constant") {
+      return make<LonCtrlConstant>(nh, longi_control, lateral_control, sliding_observer);
+    }
     if (longi_control == "classic") {
       return make<LonCtrlClassic>(nh, longi_control, lateral_control, sliding_observer);
     }
@@ -98,7 +102,7 @@ struct PathFollowingFactory<core::OneAxleSteeringCommand>
     }
     throw std::runtime_error(
       std::string{"Unknown longitudinal_control '"} + longi_control +
-      "'. Available: [classic, curvature_transition]");
+      "'. Available: [constant, classic, curvature_transition]");
   }
 
   template<typename LonCtrl>
@@ -150,6 +154,7 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
 {
   using Traits = PathFollowingTraits<core::TwoAxleSteeringCommand>;
   using Base = Traits::PathFollowingBase;
+  using LonCtrlConstant = Traits::LongitudinalControl::Constant;
   using LonCtrlClassic = Traits::LongitudinalControl::Classic;
   using LonCtrlCurvTrans = Traits::LongitudinalControl::CurvatureTransition;
   using LatCtrlClassic = Traits::LateralControl::Classic;
@@ -164,6 +169,9 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
     const std::string & lateral_control,
     const std::string & sliding_observer)
   {
+    if (longi_control == "constant") {
+      return make<LonCtrlConstant>(nh, longi_control, lateral_control, sliding_observer);
+    }
     if (longi_control == "classic") {
       return make<LonCtrlClassic>(nh, longi_control, lateral_control, sliding_observer);
     }
@@ -172,7 +180,7 @@ struct PathFollowingFactory<core::TwoAxleSteeringCommand>
     }
     throw std::runtime_error(
       std::string{"Unknown longitudinal_control '"} + longi_control +
-      "'. Available: [classic, curvature_transition]");
+      "'. Available: [constant, classic, curvature_transition]");
   }
 
   template<typename LonCtrl>
@@ -227,6 +235,7 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
 {
   using Traits = PathFollowingTraits<core::SkidSteeringCommand>;
   using Base = Traits::PathFollowingBase;
+  using LonCtrlConstant = Traits::LongitudinalControl::Constant;
   using LonCtrlClassic = Traits::LongitudinalControl::Classic;
   using LonCtrlCurvTrans = Traits::LongitudinalControl::CurvatureTransition;
   using LatCtrlBackStepping = Traits::LateralControl::BackStepping;
@@ -249,6 +258,9 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
           nh, longi_control, lateral_control, sliding_observer),
         get_wheelbase(nh));
     }
+    if (longi_control == "constant") {
+      return make<LonCtrlConstant>(nh, longi_control, lateral_control, sliding_observer);
+    }
     if (longi_control == "classic") {
       return make<LonCtrlClassic>(nh, longi_control, lateral_control, sliding_observer);
     }
@@ -257,7 +269,7 @@ struct PathFollowingFactory<core::SkidSteeringCommand>
     }
     throw std::runtime_error(
       std::string{"Unknown longitudinal_control '"} + longi_control +
-      "'. Available: [classic, curvature_transition]");
+      "'. Available: [constant, classic, curvature_transition]");
   }
 
   template <typename LonCtrl>

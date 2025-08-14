@@ -22,6 +22,7 @@
 #include <romea_common_utils/params/ros_param.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
 #include <romea_core_path_following/longitudinal_control/curvature_transition.hpp>
+#include <romea_core_path_following/longitudinal_control/constant.hpp>
 
 namespace romea::ros1
 {
@@ -81,7 +82,27 @@ struct PathFollowingLongitudinalControlParameters<
 
   static Parameters get(const ros::NodeHandle & nh)
   {
-    return {load_param_or(nh, "minimal_linear_speed", 0.3)};
+    return {
+      load_param_or(nh, "minimal_linear_speed", 0.3),
+      load_param<double>(nh, "lateral_error_max"),
+      load_param<double>(nh, "settling_time"),
+      load_param<double>(nh, "settling_distance"),
+      load_param<double>(nh, "convergence_ratio"),
+    };
+  }
+};
+
+
+template<typename Command>
+struct PathFollowingLongitudinalControlParameters<
+  core::path_following::LongitudinalControlConstant<Command>>
+{
+  using Longitudinal = core::path_following::LongitudinalControlConstant<Command>;
+  using Parameters = typename Longitudinal::Parameters;
+
+  static Parameters get(const ros::NodeHandle &  /*nh*/)
+  {
+    return {};
   }
 };
 

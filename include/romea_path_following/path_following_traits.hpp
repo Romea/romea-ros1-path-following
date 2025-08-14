@@ -24,6 +24,7 @@
 #include <romea_core_path_following/lateral_control/predictive.hpp>
 #include <romea_core_path_following/lateral_control/skid_backstepping.hpp>
 #include <romea_core_path_following/longitudinal_control/classic.hpp>
+#include <romea_core_path_following/longitudinal_control/constant.hpp>
 #include <romea_core_path_following/longitudinal_control/curvature_transition.hpp>
 #include <romea_core_path_following/path_following.hpp>
 #include <romea_core_path_following/sliding_observer/extended/cinematic_linear_tangent.hpp>
@@ -46,10 +47,11 @@ struct PathFollowingTraits<core::OneAxleSteeringCommand>
 
   struct LongitudinalControl
   {
+    using Constant =
+      core::path_following::LongitudinalControlConstant<core::OneAxleSteeringCommand>;
     using Classic = core::path_following::LongitudinalControlClassic<core::OneAxleSteeringCommand>;
     using CurvatureTransition =
-      core::path_following::LongitudinalControlCurvatureTransition<
-        core::OneAxleSteeringCommand>;
+      core::path_following::LongitudinalControlCurvatureTransition<core::OneAxleSteeringCommand>;
   };
 
   struct LateralControl
@@ -74,10 +76,11 @@ struct PathFollowingTraits<core::TwoAxleSteeringCommand>
 
   struct LongitudinalControl
   {
+    using Constant =
+      core::path_following::LongitudinalControlConstant<core::TwoAxleSteeringCommand>;
     using Classic = core::path_following::LongitudinalControlClassic<core::TwoAxleSteeringCommand>;
     using CurvatureTransition =
-      core::path_following::LongitudinalControlCurvatureTransition<
-        core::TwoAxleSteeringCommand>;
+      core::path_following::LongitudinalControlCurvatureTransition<core::TwoAxleSteeringCommand>;
   };
 
   struct LateralControl
@@ -104,10 +107,10 @@ struct PathFollowingTraits<core::SkidSteeringCommand>
 
   struct LongitudinalControl
   {
+    using Constant = core::path_following::LongitudinalControlConstant<core::SkidSteeringCommand>;
     using Classic = core::path_following::LongitudinalControlClassic<core::SkidSteeringCommand>;
     using CurvatureTransition =
-      core::path_following::LongitudinalControlCurvatureTransition<
-        core::SkidSteeringCommand>;
+      core::path_following::LongitudinalControlCurvatureTransition<core::SkidSteeringCommand>;
   };
 
   struct LateralControl
